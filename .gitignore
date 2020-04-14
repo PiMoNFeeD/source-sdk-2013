@@ -19,6 +19,7 @@ ipch
 *.idb
 *.vcxproj
 *.sln
+*.vpc.sentinel
 
 # OSX/Linux build products
 *.mak
@@ -59,4 +60,3 @@ stats.txt
 
 # shader files
 *.tmp
-
