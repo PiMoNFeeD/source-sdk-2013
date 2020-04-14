@@ -39,6 +39,7 @@ public:
 	// Input handlers
 	void InputOpen( inputdata_t &inputdata );
 	void InputClose( inputdata_t &inputdata );
+	void InputToggle( inputdata_t &inputdata );
 	void InputSetPosition( inputdata_t &inputdata );
 	void InputSetSpeed( inputdata_t &inputdata );
 	

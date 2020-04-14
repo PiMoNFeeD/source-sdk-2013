@@ -44,6 +44,7 @@ BEGIN_DATADESC( CFuncMoveLinear )
 	// Inputs
 	DEFINE_INPUTFUNC( FIELD_VOID,  "Open", InputOpen ),
 	DEFINE_INPUTFUNC( FIELD_VOID,  "Close", InputClose ),
+	DEFINE_INPUTFUNC( FIELD_VOID,  "Toggle", InputToggle ),
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetPosition", InputSetPosition ),
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetSpeed", InputSetSpeed ),
 
@@ -319,6 +320,21 @@ void CFuncMoveLinear::InputClose( inputdata_t &inputdata )
 	if (GetLocalOrigin() != m_vecPosition1)
 	{
 		MoveTo(m_vecPosition1, m_flSpeed);
+	}
+}
+
+//------------------------------------------------------------------------------
+// Purpose:
+//------------------------------------------------------------------------------
+void CFuncMoveLinear::InputToggle( inputdata_t &inputdata )
+{
+	if ( GetLocalOrigin( ) == m_vecPosition1 )
+	{
+		MoveTo( m_vecPosition2, m_flSpeed );
+	}
+	if ( GetLocalOrigin( ) == m_vecPosition2 )
+	{
+		MoveTo( m_vecPosition1, m_flSpeed );
 	}
 }
 
