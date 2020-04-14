@@ -53,6 +53,7 @@ server.dylib.dSYM/
 config.cfg
 *.cache
 sp/game/mod_episodic/cfg/*.*
+sp/game/mod_episodic/maps/graphs/*
 ep1_gamestats.dat
 GameState.txt
 voice_ban.dt
