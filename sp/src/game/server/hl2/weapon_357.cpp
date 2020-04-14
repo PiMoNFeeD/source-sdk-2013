@@ -151,10 +151,4 @@ void CWeapon357::PrimaryAttack( void )
 	pPlayer->ViewPunch( QAngle( -8, random->RandomFloat( -2, 2 ), 0 ) );
 
 	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 600, 0.2, GetOwner() );
-
-	if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
-	{
-		// HEV suit - indicate out of ammo condition
-		pPlayer->SetSuitUpdate( "!HEV_AMO0", FALSE, 0 ); 
-	}
 }

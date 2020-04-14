@@ -1065,7 +1065,6 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	int ftrivial;
 	float flRatio;
 	float flBonus;
-	float flHealthPrev = m_iHealth;
 
 	CTakeDamageInfo info = inputInfo;
 
@@ -1259,48 +1258,29 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		if (bitsDamage & DMG_CLUB)
 		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG4", false, SUIT_NEXT_IN_30SEC);	// minor fracture
 			bitsDamage &= ~DMG_CLUB;
 			ffound = true;
 		}
 		if (bitsDamage & (DMG_FALL | DMG_CRUSH))
-		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG5", false, SUIT_NEXT_IN_30SEC);	// major fracture
-			else
-				SetSuitUpdate("!HEV_DMG4", false, SUIT_NEXT_IN_30SEC);	// minor fracture
-	
+		{	
 			bitsDamage &= ~(DMG_FALL | DMG_CRUSH);
 			ffound = true;
 		}
 		
 		if (bitsDamage & DMG_BULLET)
-		{
-			if (m_lastDamageAmount > 5)
-				SetSuitUpdate("!HEV_DMG6", false, SUIT_NEXT_IN_30SEC);	// blood loss detected
-			//else
-			//	SetSuitUpdate("!HEV_DMG0", false, SUIT_NEXT_IN_30SEC);	// minor laceration
-			
+		{			
 			bitsDamage &= ~DMG_BULLET;
 			ffound = true;
 		}
 
 		if (bitsDamage & DMG_SLASH)
 		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG1", false, SUIT_NEXT_IN_30SEC);	// major laceration
-			else
-				SetSuitUpdate("!HEV_DMG0", false, SUIT_NEXT_IN_30SEC);	// minor laceration
-
 			bitsDamage &= ~DMG_SLASH;
 			ffound = true;
 		}
 		
 		if (bitsDamage & DMG_SONIC)
 		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG2", false, SUIT_NEXT_IN_1MIN);	// internal bleeding
 			bitsDamage &= ~DMG_SONIC;
 			ffound = true;
 		}
@@ -1314,28 +1294,24 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 				m_rgbTimeBasedDamage[itbd_PoisonRecover] = 0;
 			}
 
-			SetSuitUpdate("!HEV_DMG3", false, SUIT_NEXT_IN_1MIN);	// blood toxins detected
 			bitsDamage &= ~( DMG_POISON | DMG_PARALYZE );
 			ffound = true;
 		}
 
 		if (bitsDamage & DMG_ACID)
 		{
-			SetSuitUpdate("!HEV_DET1", false, SUIT_NEXT_IN_1MIN);	// hazardous chemicals detected
 			bitsDamage &= ~DMG_ACID;
 			ffound = true;
 		}
 
 		if (bitsDamage & DMG_NERVEGAS)
 		{
-			SetSuitUpdate("!HEV_DET0", false, SUIT_NEXT_IN_1MIN);	// biohazard detected
 			bitsDamage &= ~DMG_NERVEGAS;
 			ffound = true;
 		}
 
 		if (bitsDamage & DMG_RADIATION)
 		{
-			SetSuitUpdate("!HEV_DET2", false, SUIT_NEXT_IN_1MIN);	// radiation detected
 			bitsDamage &= ~DMG_RADIATION;
 			ffound = true;
 		}
@@ -1357,42 +1333,6 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	}
 
 	m_Local.m_vecPunchAngle.SetX( flPunch );
-
-	if (fTookDamage && !ftrivial && fmajor && flHealthPrev >= 75) 
-	{
-		// first time we take major damage...
-		// turn automedic on if not on
-		SetSuitUpdate("!HEV_MED1", false, SUIT_NEXT_IN_30MIN);	// automedic on
-
-		// give morphine shot if not given recently
-		SetSuitUpdate("!HEV_HEAL7", false, SUIT_NEXT_IN_30MIN);	// morphine shot
-	}
-	
-	if (fTookDamage && !ftrivial && fcritical && flHealthPrev < 75)
-	{
-
-		// already took major damage, now it's critical...
-		if (m_iHealth < 6)
-			SetSuitUpdate("!HEV_HLTH3", false, SUIT_NEXT_IN_10MIN);	// near death
-		else if (m_iHealth < 20)
-			SetSuitUpdate("!HEV_HLTH2", false, SUIT_NEXT_IN_10MIN);	// health critical
-	
-		// give critical health warnings
-		if (!random->RandomInt(0,3) && flHealthPrev < 50)
-			SetSuitUpdate("!HEV_DMG7", false, SUIT_NEXT_IN_5MIN); //seek medical attention
-	}
-
-	// if we're taking time based damage, warn about its continuing effects
-	if (fTookDamage && g_pGameRules->Damage_IsTimeBased( info.GetDamageType() ) && flHealthPrev < 75)
-		{
-			if (flHealthPrev < 50)
-			{
-				if (!random->RandomInt(0,3))
-					SetSuitUpdate("!HEV_DMG7", false, SUIT_NEXT_IN_5MIN); //seek medical attention
-			}
-			else
-				SetSuitUpdate("!HEV_HLTH1", false, SUIT_NEXT_IN_10MIN);	// health dropping
-		}
 
 	// Do special explosion damage effect
 	if ( bitsDamage & DMG_BLAST )
@@ -1709,9 +1649,6 @@ void CBasePlayer::Event_Killed( const CTakeDamageInfo &info )
 
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	SetGroundEntity( NULL );
-
-	// clear out the suit message cache so we don't keep chattering
-	SetSuitUpdate(NULL, false, 0);
 
 	// reset FOV
 	SetFOV( this, 0 );
@@ -2255,9 +2192,6 @@ bool CBasePlayer::StartObserverMode(int mode)
 	// Holster weapon immediately, to allow it to cleanup
     if ( GetActiveWeapon() )
 		GetActiveWeapon()->Holster();
-
-	// clear out the suit message cache so we don't keep chattering
-    SetSuitUpdate(NULL, FALSE, 0);
 
 	SetGroundEntity( (CBaseEntity *)NULL );
 	
@@ -3829,8 +3763,6 @@ void CBasePlayer::PreThink(void)
 	
 	CheckTimeBasedDamage();
 
-	CheckSuitUpdate();
-
 	if ( GetObserverMode() > OBS_MODE_FREEZECAM )
 	{
 		CheckObserverSettings();	// do this each frame
@@ -4162,171 +4094,6 @@ void CBasePlayer::UpdateGeigerCounter( void )
 	{
 		m_flgeigerRange = 1000;
 	}
-}
-
-/*
-================
-CheckSuitUpdate
-
-Play suit update if it's time
-================
-*/
-
-#define SUITUPDATETIME	3.5
-#define SUITFIRSTUPDATETIME 0.1
-
-void CBasePlayer::CheckSuitUpdate()
-{
-	int i;
-	int isentence = 0;
-	int isearch = m_iSuitPlayNext;
-	
-	// Ignore suit updates if no suit
-	if ( !IsSuitEquipped() )
-		return;
-
-	// if in range of radiation source, ping geiger counter
-	UpdateGeigerCounter();
-
-	if ( g_pGameRules->IsMultiplayer() )
-	{
-		// don't bother updating HEV voice in multiplayer.
-		return;
-	}
-
-	if ( gpGlobals->curtime >= m_flSuitUpdate && m_flSuitUpdate > 0)
-	{
-		// play a sentence off of the end of the queue
-		for (i = 0; i < CSUITPLAYLIST; i++)
-			{
-			if ((isentence = m_rgSuitPlayList[isearch]) != 0)
-				break;
-			
-			if (++isearch == CSUITPLAYLIST)
-				isearch = 0;
-			}
-
-		if (isentence)
-		{
-			m_rgSuitPlayList[isearch] = 0;
-			if (isentence > 0)
-			{
-				// play sentence number
-
-				char sentence[512];
-				Q_snprintf( sentence, sizeof( sentence ), "!%s", engine->SentenceNameFromIndex( isentence ) );
-				UTIL_EmitSoundSuit( edict(), sentence );
-			}
-			else
-			{
-				// play sentence group
-				UTIL_EmitGroupIDSuit(edict(), -isentence);
-			}
-		m_flSuitUpdate = gpGlobals->curtime + SUITUPDATETIME;
-		}
-		else
-			// queue is empty, don't check 
-			m_flSuitUpdate = 0;
-	}
-}
- 
-// add sentence to suit playlist queue. if fgroup is true, then
-// name is a sentence group (HEV_AA), otherwise name is a specific
-// sentence name ie: !HEV_AA0.  If iNoRepeat is specified in
-// seconds, then we won't repeat playback of this word or sentence
-// for at least that number of seconds.
-
-void CBasePlayer::SetSuitUpdate(const char *name, int fgroup, int iNoRepeatTime)
-{
-	int i;
-	int isentence;
-	int iempty = -1;
-	
-	
-	// Ignore suit updates if no suit
-	if ( !IsSuitEquipped() )
-		return;
-
-	if ( g_pGameRules->IsMultiplayer() )
-	{
-		// due to static channel design, etc. We don't play HEV sounds in multiplayer right now.
-		return;
-	}
-
-	// if name == NULL, then clear out the queue
-
-	if (!name)
-	{
-		for (i = 0; i < CSUITPLAYLIST; i++)
-			m_rgSuitPlayList[i] = 0;
-		return;
-	}
-	// get sentence or group number
-	if (!fgroup)
-	{
-		isentence = SENTENCEG_Lookup(name);	// Lookup sentence index (not group) by name
-		if (isentence < 0)
-			return;
-	}
-	else
-		// mark group number as negative
-		isentence = -SENTENCEG_GetIndex(name);		// Lookup group index by name
-
-	// check norepeat list - this list lets us cancel
-	// the playback of words or sentences that have already
-	// been played within a certain time.
-
-	for (i = 0; i < CSUITNOREPEAT; i++)
-	{
-		if (isentence == m_rgiSuitNoRepeat[i])
-			{
-			// this sentence or group is already in 
-			// the norepeat list
-
-			if (m_rgflSuitNoRepeatTime[i] < gpGlobals->curtime)
-				{
-				// norepeat time has expired, clear it out
-				m_rgiSuitNoRepeat[i] = 0;
-				m_rgflSuitNoRepeatTime[i] = 0.0;
-				iempty = i;
-				break;
-				}
-			else
-				{
-				// don't play, still marked as norepeat
-				return;
-				}
-			}
-		// keep track of empty slot
-		if (!m_rgiSuitNoRepeat[i])
-			iempty = i;
-	}
-
-	// sentence is not in norepeat list, save if norepeat time was given
-
-	if (iNoRepeatTime)
-	{
-		if (iempty < 0)
-			iempty = random->RandomInt(0, CSUITNOREPEAT-1); // pick random slot to take over
-		m_rgiSuitNoRepeat[iempty] = isentence;
-		m_rgflSuitNoRepeatTime[iempty] = iNoRepeatTime + gpGlobals->curtime;
-	}
-
-	// find empty spot in queue, or overwrite last spot
-	
-	m_rgSuitPlayList[m_iSuitPlayNext++] = isentence;
-	if (m_iSuitPlayNext == CSUITPLAYLIST)
-		m_iSuitPlayNext = 0;
-
-	if (m_flSuitUpdate <= gpGlobals->curtime)
-	{
-		if (m_flSuitUpdate == 0)
-			// play queue is empty, don't delay too long before playback
-			m_flSuitUpdate = gpGlobals->curtime + SUITFIRSTUPDATETIME;
-		else 
-			m_flSuitUpdate = gpGlobals->curtime + SUITUPDATETIME; 
-	}
-
 }
 
 //=========================================================
@@ -5038,6 +4805,12 @@ void CBasePlayer::Spawn( void )
 	UpdateLastKnownArea();
 
 	m_weaponFiredTimer.Invalidate();
+
+	// equip suit if it's not equipped and if we're not loaded into menu background map
+	if ( (gpGlobals->eLoadType != MapLoad_Background) && !IsSuitEquipped( ) )
+	{
+		EquipSuit();
+	}
 }
 
 void CBasePlayer::Activate( void )
@@ -8603,7 +8376,7 @@ bool CBasePlayer::IsFakeClient() const
 	return (GetFlags() & FL_FAKECLIENT) != 0;
 }
 
-void CBasePlayer::EquipSuit( bool bPlayEffects )
+void CBasePlayer::EquipSuit( void )
 { 
 	m_Local.m_bWearingSuit = true; 
 }

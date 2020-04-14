@@ -255,10 +255,8 @@ public:
 	virtual void		ExitLadder();
 	virtual surfacedata_t *GetLadderSurface( const Vector &origin );
 
-	virtual void EquipSuit( bool bPlayEffects = true );
+	virtual void EquipSuit( void );
 	virtual void RemoveSuit( void );
-	void  HandleAdmireGlovesAnimation( void );
-	void  StartAdmireGlovesAnimation( void );
 	
 	void  HandleSpeedChanges( void );
 

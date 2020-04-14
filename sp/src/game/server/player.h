@@ -551,8 +551,6 @@ public:
 	virtual void			ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldindThis = NULL ) {}
 	virtual float			GetHeldObjectMass( IPhysicsObject *pHeldObject );
 
-	void					CheckSuitUpdate();
-	void					SetSuitUpdate(const char *name, int fgroup, int iNoRepeat);
 	virtual void			UpdateGeigerCounter( void );
 	void					CheckTimeBasedDamage( void );
 
@@ -694,7 +692,7 @@ public:
 	void	IncrementArmorValue( int nCount, int nMaxValue = -1 );
 
 	void	SetConnected( PlayerConnectedState iConnected ) { m_iConnected = iConnected; }
-	virtual void EquipSuit( bool bPlayEffects = true );
+	virtual void EquipSuit( void );
 	virtual void RemoveSuit( void );
 	void	SetMaxSpeed( float flMaxSpeed ) { m_flMaxspeed = flMaxSpeed; }
 

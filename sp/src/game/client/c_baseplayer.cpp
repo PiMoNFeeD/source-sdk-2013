@@ -2233,12 +2233,6 @@ void C_BasePlayer::PlayPlayerJingle()
 #endif
 }
 
-// Stuff for prediction
-void C_BasePlayer::SetSuitUpdate(const char *name, int fgroup, int iNoRepeat)
-{
-	// FIXME:  Do something here?
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
