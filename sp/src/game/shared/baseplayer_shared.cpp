@@ -1614,7 +1614,7 @@ void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& f
 	// Snack off the origin before bob + water offset are applied
 	Vector vecBaseEyePosition = eyeOrigin;
 
-	CalcViewRoll( eyeAngles );
+	CalcViewBob( eyeAngles );
 
 	// Apply punch angle
 	VectorAdd( eyeAngles, m_Local.m_vecPunchAngle, eyeAngles );
@@ -1670,7 +1670,7 @@ void CBasePlayer::CalcVehicleView(
 	// Snack off the origin before bob + water offset are applied
 	Vector vecBaseEyePosition = eyeOrigin;
 
-	CalcViewRoll( eyeAngles );
+	CalcViewBob( eyeAngles );
 
 	// Apply punch angle
 	VectorAdd( eyeAngles, m_Local.m_vecPunchAngle, eyeAngles );
@@ -1756,15 +1756,54 @@ float CBasePlayer::CalcRoll (const QAngle& angles, const Vector& velocity, float
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Compute pitch angle for a particular lateral velocity
+// Input  : angles - 
+//			velocity - 
+//			rollangle - 
+//			rollspeed - 
+// Output : float CViewRender::CalcRoll
+//-----------------------------------------------------------------------------
+float CBasePlayer::CalcPitch (const QAngle& angles, const Vector& velocity, float rollangle, float rollspeed)
+{
+    float   sign;
+    float   side;
+    float   value;
+	
+	Vector  forward, right, up;
+	
+    AngleVectors (angles, &forward, &right, &up);
+	
+	// Get amount of lateral movement
+    side = DotProduct( velocity, forward );
+	// Right or left side?
+    sign = side < 0 ? -1 : 1;
+    side = fabs(side);
+    
+	value = rollangle;
+	// Hit 100% of rollangle at rollspeed.  Below that get linear approx.
+    if ( side < rollspeed )
+	{
+		side = side * value / rollspeed;
+	}
+    else
+	{
+		side = value;
+	}
+
+	// Scale by right/left sign
+    return side*sign;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Determine view roll, including data kick
 //-----------------------------------------------------------------------------
-void CBasePlayer::CalcViewRoll( QAngle& eyeAngles )
+void CBasePlayer::CalcViewBob( QAngle& eyeAngles )
 {
 	if ( GetMoveType() == MOVETYPE_NOCLIP )
 		return;
 
-	float side = CalcRoll( GetAbsAngles(), GetAbsVelocity(), sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() );
-	eyeAngles[ROLL] += side;
+	eyeAngles[ROLL] += CalcRoll( GetAbsAngles( ), GetAbsVelocity( ), sv_rollangle.GetFloat( ), sv_rollspeed.GetFloat( ) ) * 3;
+	eyeAngles[PITCH] += CalcPitch( GetAbsAngles( ), GetAbsVelocity( ), sv_rollangle.GetFloat( ), sv_rollspeed.GetFloat( ) ) * 3;
 }
 
 

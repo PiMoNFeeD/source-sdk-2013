@@ -79,9 +79,9 @@ extern int gEvilImpulse101;
 
 ConVar sv_autojump( "sv_autojump", "0" );
 
-ConVar hl2_walkspeed( "hl2_walkspeed", "150" );
-ConVar hl2_normspeed( "hl2_normspeed", "190" );
-ConVar hl2_sprintspeed( "hl2_sprintspeed", "320" );
+ConVar hl2_walkspeed( "hl2_walkspeed", "90", FCVAR_CHEAT );
+ConVar hl2_normspeed( "hl2_normspeed", "170", FCVAR_CHEAT );
+ConVar hl2_sprintspeed( "hl2_sprintspeed", "288", FCVAR_CHEAT );
 
 ConVar hl2_darkness_flashlight_factor ( "hl2_darkness_flashlight_factor", "1" );
 
@@ -882,6 +882,12 @@ void CHL2_Player::PreThink(void)
 			m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
 		}
 	}
+
+	// stop sprinting if sprinting and holding down +back key or not holding down +forward key
+	if ( IsSprinting( ) && ((m_nButtons & (IN_BACK)) || !(m_nButtons & (IN_FORWARD))) )
+	{
+		StopSprinting( );
+	}
 }
 
 void CHL2_Player::PostThink( void )
@@ -1148,6 +1154,10 @@ void CHL2_Player::StartSprinting( void )
 		}
 		return;
 	}
+
+	// do not sprint if not holding +forward key or holding +back key
+	if ( !(m_nButtons & IN_FORWARD) || (m_nButtons & (IN_BACK)) )
+		return;
 
 	if( !SuitPower_AddDevice( SuitDeviceSprint ) )
 		return;
