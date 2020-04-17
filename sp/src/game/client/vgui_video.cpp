@@ -400,8 +400,11 @@ CON_COMMAND( playvideo, "Plays a video: <filename> [width height]" )
 
 CON_COMMAND( playvideo_exitcommand, "Plays a video and fires and exit command when it is stopped or finishes: <filename> <exit command>" )
 {
-	if ( args.ArgC() < 2 )
+	if ( args.ArgC() < 3 ) // do not play the video if exit command is not specified - will result in a softlock! p.s. the command itself counts as an argument too
+	{
+		Warning( "Too less arguments" );
 		return;
+	}
 
 	unsigned int nScreenWidth = ScreenWidth();
 	unsigned int nScreenHeight = ScreenHeight();
