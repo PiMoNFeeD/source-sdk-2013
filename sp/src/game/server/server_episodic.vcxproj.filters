@@ -3505,6 +3505,7 @@
     <ClCompile Include="toolframework_server.cpp">
       <Filter>Tools Framework</Filter>
     </ClCompile>
+    <ClCompile Include="logic_playmovie.cpp" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

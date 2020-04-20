@@ -47,6 +47,7 @@ public:
 	bool BeginPlayback( const char *pFilename );
 
 	void SetBlackBackground( bool bBlack ){ m_bBlackBackground = bBlack; }
+	void SetAllowInterrupt( bool bAllowInterrupt ) { m_bAllowInterruption = bAllowInterrupt; }
 
 protected:
 
@@ -66,6 +67,7 @@ protected:
 	float			m_flV;
 
 	bool			m_bBlackBackground;
+	bool			m_bAllowInterruption;
 	bool			m_bAllowAlternateMedia;
 };
 

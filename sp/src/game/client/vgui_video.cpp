@@ -22,9 +22,10 @@ VideoPanel::VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHe
 	m_VideoMaterial( NULL ),
 	m_nPlaybackWidth( 0 ),
 	m_nPlaybackHeight( 0 ),
+	m_bAllowInterruption( true ),
 	m_bAllowAlternateMedia( allowAlternateMedia )
 {
-	vgui::VPANEL pParent = enginevgui->GetPanel( PANEL_GAMEUIDLL );
+	vgui::VPANEL pParent = enginevgui->GetPanel( PANEL_ROOT );
 	SetParent( pParent );
 	SetVisible( false );
 	
@@ -32,6 +33,7 @@ VideoPanel::VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHe
 	m_szExitCommand[0] = '\0';
 
 	m_bBlackBackground = true;
+	SetCursor( null );
 
 	SetKeyBoardInputEnabled( true );
 	SetMouseInputEnabled( false );
@@ -71,18 +73,6 @@ VideoPanel::~VideoPanel( void )
 //-----------------------------------------------------------------------------
 bool VideoPanel::BeginPlayback( const char *pFilename )
 {
-	// Who the heck hacked this in?
-#ifdef _X360
-	XVIDEO_MODE videoMode;
-	XGetVideoMode( &videoMode );
-
-	// for 50Hz PAL, load a 25Hz version of the ep1_recap movie.
-	if( ( videoMode.RefreshRate < 59.0f ) && ( Q_stricmp( pFilename, "media/ep1_recap.bik" ) == 0 ) )
-	{
-		pFilename = "media/ep1_recap_25fps.bik";
-	}
-#endif
-
 	// need working video services
 	if ( g_pVideo == NULL )
 		return false;
@@ -163,7 +153,8 @@ void VideoPanel::DoModal( void )
 //-----------------------------------------------------------------------------
 void VideoPanel::OnKeyCodeTyped( vgui::KeyCode code )
 {
-	if ( code == KEY_ESCAPE	)
+	bool bInterruptKeyPressed = ( code == KEY_ESCAPE );
+	if ( m_bAllowInterruption && bInterruptKeyPressed )
 	{
 		OnClose();
 	}
@@ -178,17 +169,20 @@ void VideoPanel::OnKeyCodeTyped( vgui::KeyCode code )
 //-----------------------------------------------------------------------------
 void VideoPanel::OnKeyCodePressed( vgui::KeyCode code )
 {
+	// All these keys will interrupt playback
+	bool bInterruptKeyPressed =	  ( code == KEY_ESCAPE || 
+									code == KEY_BACKQUOTE || 
+									code == KEY_SPACE || 
+									code == KEY_ENTER ||
+									code == KEY_XBUTTON_A || 
+									code == KEY_XBUTTON_B ||
+									code == KEY_XBUTTON_X || 
+									code == KEY_XBUTTON_Y || 
+									code == KEY_XBUTTON_START || 
+									code == KEY_XBUTTON_BACK );
+	
 	// These keys cause the panel to shutdown
-	if ( code == KEY_ESCAPE || 
-		 code == KEY_BACKQUOTE || 
-		 code == KEY_SPACE || 
-		 code == KEY_ENTER ||
-		 code == KEY_XBUTTON_A || 
-		 code == KEY_XBUTTON_B ||
-		 code == KEY_XBUTTON_X || 
-		 code == KEY_XBUTTON_Y || 
-		 code == KEY_XBUTTON_START || 
-		 code == KEY_XBUTTON_BACK )
+	if ( m_bAllowInterruption && bInterruptKeyPressed )
 	{
 		OnClose();
 	}
@@ -335,12 +329,16 @@ void VideoPanel::Paint( void )
 bool VideoPanel_Create( unsigned int nXPos, unsigned int nYPos, 
 						unsigned int nWidth, unsigned int nHeight, 
 						const char *pVideoFilename, 
-						const char *pExitCommand /*= NULL*/)
+						const char *pExitCommand /*= NULL*/,
+						bool bAllowInterruption /*= true*/)
 {
 	// Create the base video panel
-	VideoPanel *pVideoPanel = new VideoPanel( nXPos, nYPos, nHeight, nWidth, false  );
+	VideoPanel *pVideoPanel = new VideoPanel( nXPos, nYPos, nHeight, nWidth, false );
 	if ( pVideoPanel == NULL )
 		return false;
+
+	// Toggle if we want the panel to allow interruption
+	pVideoPanel->SetAllowInterrupt(bAllowInterruption);
 
 	// Set the command we'll call (if any) when the video is interrupted or completes
 	pVideoPanel->SetExitCommand( pExitCommand );
@@ -359,8 +357,7 @@ bool VideoPanel_Create( unsigned int nXPos, unsigned int nYPos,
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Used to launch a video playback (Debug) -
-//  user must include file extension
+// Purpose: Used to launch a video playback
 //-----------------------------------------------------------------------------
 
 CON_COMMAND( playvideo, "Plays a video: <filename> [width height]" )
@@ -388,7 +385,7 @@ CON_COMMAND( playvideo, "Plays a video: <filename> [width height]" )
 	}
 
 	// Create the panel and go!
-	if ( VideoPanel_Create( 0, 0, nScreenWidth, nScreenHeight, strFullpath ) == false )
+	if ( VideoPanel_Create( 0, 0, nScreenWidth, nScreenHeight, strFullpath, NULL, true ) == false )
 	{
 		Warning( "Unable to play video: %s\n", strFullpath );
 	}
@@ -418,7 +415,38 @@ CON_COMMAND( playvideo_exitcommand, "Plays a video and fires and exit command wh
 	char *pExitCommand = Q_strstr( args.GetCommandString(), args[2] );
 
 	// Create the panel and go!
-	if ( VideoPanel_Create( 0, 0, nScreenWidth, nScreenHeight, strFullpath, pExitCommand ) == false )
+	if ( VideoPanel_Create( 0, 0, nScreenWidth, nScreenHeight, strFullpath, pExitCommand, true ) == false )
+	{
+		Warning( "Unable to play video: %s\n", strFullpath );
+		engine->ClientCmd( pExitCommand );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Used to launch a video playback and fire a command on completion
+//-----------------------------------------------------------------------------
+
+CON_COMMAND( playvideo_exitcommand_nointerrupt, "Plays a video (without interruption) and fires and exit command when it is stopped or finishes: <filename> <exit command>" )
+{
+	if ( args.ArgC() < 3 ) // do not play the video if exit command is not specified - will result in a softlock! p.s. the command itself counts as an argument too
+	{
+		Warning( "Too less arguments" );
+		return;
+	}
+
+	unsigned int nScreenWidth = ScreenWidth();
+	unsigned int nScreenHeight = ScreenHeight();
+
+	char strFullpath[MAX_PATH];
+	Q_strncpy( strFullpath, "media/", MAX_PATH );	// Assume we must play out of the media directory
+	char strFilename[MAX_PATH];
+	Q_StripExtension( args[1], strFilename, MAX_PATH );
+	Q_strncat( strFullpath, args[1], MAX_PATH );
+
+	char *pExitCommand = Q_strstr( args.GetCommandString(), args[2] );
+
+	// Create the panel and go!
+	if ( VideoPanel_Create( 0, 0, nScreenWidth, nScreenHeight, strFullpath, pExitCommand, false ) == false )
 	{
 		Warning( "Unable to play video: %s\n", strFullpath );
 		engine->ClientCmd( pExitCommand );
