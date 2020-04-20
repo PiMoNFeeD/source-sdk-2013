@@ -857,30 +857,12 @@ void CHL2_Player::PreThink(void)
 	// Update weapon's ready status
 	UpdateWeaponPosture();
 
-	// Disallow shooting while zooming
-	if ( IsX360() )
+	if ( /*m_nButtons & IN_ZOOM ||*/ IsZooming() ) // isn't it the same?
 	{
-		if ( IsZooming() )
-		{
-			if( GetActiveWeapon() && !GetActiveWeapon()->IsWeaponZoomed() )
-			{
-				// If not zoomed because of the weapon itself, do not attack.
-				m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
-			}
-		}
-	}
-	else
-	{
-		if ( m_nButtons & IN_ZOOM )
-		{
-			//FIXME: Held weapons like the grenade get sad when this happens
-	#ifdef HL2_EPISODIC
-			// Episodic allows players to zoom while using a func_tank
-			CBaseCombatWeapon* pWep = GetActiveWeapon();
-			if ( !m_hUseEntity || ( pWep && pWep->IsWeaponVisible() ) )
-	#endif
+		//FIXME: Held weapons like the grenade get sad when this happens
+		CBaseCombatWeapon* pWep = GetActiveWeapon();
+		if ( pWep && pWep->IsWeaponVisible() && pWep->IsMeleeWeapon() ) // cant attack while zooming if using melee weapon
 			m_nButtons &= ~(IN_ATTACK|IN_ATTACK2);
-		}
 	}
 
 	// stop sprinting if sprinting and holding down +back key or not holding down +forward key
