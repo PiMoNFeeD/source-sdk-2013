@@ -33,7 +33,6 @@ VideoPanel::VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHe
 	m_szExitCommand[0] = '\0';
 
 	m_bBlackBackground = true;
-	SetCursor( null );
 
 	SetKeyBoardInputEnabled( true );
 	SetMouseInputEnabled( false );
@@ -42,6 +41,7 @@ VideoPanel::VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHe
 	SetVisible( true );
 	SetPaintBackgroundEnabled( false );
 	SetPaintBorderEnabled( false );
+	SetCursor( null );
 	
 	// Set us up
 	SetTall( nHeight );
@@ -65,6 +65,10 @@ VideoPanel::~VideoPanel( void )
 		g_pVideo->DestroyVideoMaterial( m_VideoMaterial );
 		m_VideoMaterial = NULL;
 	}
+
+	// weird hack to prevent player from seeing pause menu after the video end
+	if ( engine->IsPaused() )
+		engine->ClientCmd_Unrestricted("cancelselect");
 }
 
 //-----------------------------------------------------------------------------
