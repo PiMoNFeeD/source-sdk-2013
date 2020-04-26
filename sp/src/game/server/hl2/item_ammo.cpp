@@ -53,7 +53,7 @@ public:
 	{
 		PrecacheModel ("models/items/boxsrounds.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_PISTOL, "Pistol"))
 		{
@@ -88,7 +88,7 @@ public:
 	{
 		PrecacheModel ("models/items/boxsrounds.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_PISTOL_LARGE, "Pistol"))
 		{
@@ -122,7 +122,7 @@ public:
 	{
 		PrecacheModel ("models/items/boxmrounds.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_SMG1, "SMG1"))
 		{
@@ -156,7 +156,7 @@ public:
 	{
 		PrecacheModel ("models/items/boxmrounds.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_SMG1_LARGE, "SMG1"))
 		{
@@ -190,7 +190,7 @@ public:
 	{
 		PrecacheModel ("models/items/combine_rifle_cartridge01.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_AR2, "AR2"))
 		{
@@ -224,7 +224,7 @@ public:
 	{
 		PrecacheModel ("models/items/combine_rifle_cartridge01.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_AR2_LARGE, "AR2"))
 		{
@@ -260,7 +260,7 @@ public:
 		BaseClass::Spawn( );
 	}
 
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_357, "357"))
 		{
@@ -295,7 +295,7 @@ public:
 		BaseClass::Spawn( );
 	}
 
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_357_LARGE, "357"))
 		{
@@ -331,7 +331,7 @@ public:
 		BaseClass::Spawn( );
 	}
 
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_CROSSBOW, "XBowBolt" ))
 		{
@@ -365,7 +365,7 @@ public:
 	{
 		PrecacheModel ("models/items/flare.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, 1, "FlareRound"))
 		{
@@ -400,7 +400,7 @@ public:
 	{
 		PrecacheModel ("models/items/boxflares.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_BOX_FLARE_ROUNDS, "FlareRound"))
 		{
@@ -433,7 +433,7 @@ public:
 	{
 		PrecacheModel ("models/weapons/w_missile_closed.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_RPG_ROUND, "RPG_Round"))
 		{
@@ -467,7 +467,7 @@ public:
 	{
 		PrecacheModel ("models/items/ar2_grenade.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_SMG1_GRENADE, "SMG1_Grenade"))
 		{
@@ -503,7 +503,7 @@ public:
 	{
 		PrecacheModel ("models/items/boxsniperrounds.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_BOX_SNIPER_ROUNDS, "SniperRound"))
 		{
@@ -537,7 +537,7 @@ public:
 	{
 		PrecacheModel ("models/items/boxbuckshot.mdl");
 	}
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_BUCKSHOT, "Buckshot"))
 		{
@@ -573,7 +573,7 @@ public:
 		BaseClass::Spawn( );
 	}
 
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_AR2_ALTFIRE, "AR2AltFire" ) )
 		{

@@ -29,7 +29,7 @@ public:
 
 	void Spawn( void );
 	void Precache( void );
-	bool MyTouch( CBasePlayer *pPlayer );
+	bool MyUse( CBasePlayer *pPlayer );
 };
 
 LINK_ENTITY_TO_CLASS( item_healthkit, CHealthKit );
@@ -64,7 +64,7 @@ void CHealthKit::Precache( void )
 // Input  : *pPlayer - 
 // Output : 
 //-----------------------------------------------------------------------------
-bool CHealthKit::MyTouch( CBasePlayer *pPlayer )
+bool CHealthKit::MyUse( CBasePlayer *pPlayer )
 {
 	if ( pPlayer->TakeHealth( sk_healthkit.GetFloat(), DMG_GENERIC ) )
 	{
@@ -117,7 +117,7 @@ public:
 		PrecacheScriptSound( "HealthVial.Touch" );
 	}
 
-	bool MyTouch( CBasePlayer *pPlayer )
+	bool MyUse( CBasePlayer *pPlayer )
 	{
 		if ( pPlayer->TakeHealth( sk_healthvial.GetFloat(), DMG_GENERIC ) )
 		{

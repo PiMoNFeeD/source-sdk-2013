@@ -65,9 +65,9 @@ void CWorldItem::Spawn( void )
 	case 44: // ITEM_BATTERY:
 		pEntity = CBaseEntity::Create( "item_battery", GetLocalOrigin(), GetLocalAngles() );
 		break;
-	case 45: // ITEM_SUIT:
+	/*case 45: // ITEM_SUIT:
 		pEntity = CBaseEntity::Create( "item_suit", GetLocalOrigin(), GetLocalAngles() );
-		break;
+		break;*/
 	}
 
 	if (!pEntity)
@@ -94,7 +94,6 @@ BEGIN_DATADESC( CItem )
 	DEFINE_PHYSPTR( m_pConstraint ),
 
 	// Function Pointers
-	DEFINE_ENTITYFUNC( ItemTouch ),
 	DEFINE_THINKFUNC( Materialize ),
 	DEFINE_THINKFUNC( ComeToRest ),
 
@@ -169,7 +168,6 @@ void CItem::Spawn( void )
 	// against other items + weapons
 	SetCollisionGroup( COLLISION_GROUP_WEAPON );
 	CollisionProp()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT );
-	SetTouch(&CItem::ItemTouch);
 
 	if ( CreateItemVPhysicsObject() == false )
 		return;
@@ -219,7 +217,42 @@ void CItem::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType
 
 	if ( pPlayer )
 	{
-		pPlayer->PickupObject( this );
+		m_OnCacheInteraction.FireOutput(pActivator, this);
+
+		// Can I even pick stuff up?
+		if ( !pPlayer->IsAllowedToPickupWeapons() )
+			return;
+
+		// ok, a player is using this item, but can he have it?
+		if ( !g_pGameRules->CanHaveItem(pPlayer, this) )
+		{
+			// no? Ignore the use.
+			return;
+		}
+
+		if ( MyUse( pPlayer ) )
+		{
+			m_OnPlayerTouch.FireOutput(pActivator, this);
+
+			SetTouch(NULL);
+			SetThink(NULL);
+
+			// player grabbed the item. 
+			g_pGameRules->PlayerGotItem(pPlayer, this);
+			if ( g_pGameRules->ItemShouldRespawn(this) == GR_ITEM_RESPAWN_YES )
+			{
+				Respawn();
+			} else
+			{
+				UTIL_Remove(this);
+
+#ifdef HL2MP
+				HL2MPRules()->RemoveLevelDesignerPlacedObject(this);
+#endif
+			}
+		} else {
+			pPlayer->PickupObject(this);
+		}
 	}
 }
 
@@ -391,73 +424,6 @@ bool CItem::ItemCanBeTouchedByPlayer( CBasePlayer *pPlayer )
 	return UTIL_ItemCanBeTouchedByPlayer( this, pPlayer );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : pOther - 
-//-----------------------------------------------------------------------------
-void CItem::ItemTouch( CBaseEntity *pOther )
-{
-	// Vehicles can touch items + pick them up
-	if ( pOther->GetServerVehicle() )
-	{
-		pOther = pOther->GetServerVehicle()->GetPassenger();
-		if ( !pOther )
-			return;
-	}
-
-	// if it's not a player, ignore
-	if ( !pOther->IsPlayer() )
-		return;
-
-	CBasePlayer *pPlayer = (CBasePlayer *)pOther;
-
-	// Must be a valid pickup scenario (no blocking). Though this is a more expensive
-	// check than some that follow, this has to be first Obecause it's the only one
-	// that inhibits firing the output OnCacheInteraction.
-	if ( ItemCanBeTouchedByPlayer( pPlayer ) == false )
-		return;
-
-	m_OnCacheInteraction.FireOutput(pOther, this);
-
-	// Can I even pick stuff up?
-	if ( !pPlayer->IsAllowedToPickupWeapons() )
-		return;
-
-	// ok, a player is touching this item, but can he have it?
-	if ( !g_pGameRules->CanHaveItem( pPlayer, this ) )
-	{
-		// no? Ignore the touch.
-		return;
-	}
-
-	if ( MyTouch( pPlayer ) )
-	{
-		m_OnPlayerTouch.FireOutput(pOther, this);
-
-		SetTouch( NULL );
-		SetThink( NULL );
-
-		// player grabbed the item. 
-		g_pGameRules->PlayerGotItem( pPlayer, this );
-		if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_YES )
-		{
-			Respawn(); 
-		}
-		else
-		{
-			UTIL_Remove( this );
-
-#ifdef HL2MP
-			HL2MPRules()->RemoveLevelDesignerPlacedObject( this );
-#endif
-		}
-	}
-	else if (gEvilImpulse101)
-	{
-		UTIL_Remove( this );
-	}
-}
-
 CBaseEntity* CItem::Respawn( void )
 {
 	SetTouch( NULL );
@@ -499,8 +465,6 @@ void CItem::Materialize( void )
 		RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();
 	}
-
-	SetTouch( &CItem::ItemTouch );
 }
 
 //-----------------------------------------------------------------------------

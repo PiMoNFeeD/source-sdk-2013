@@ -51,9 +51,9 @@ public:
 	unsigned int PhysicsSolidMaskForEntity( void ) const;
 
 	virtual CBaseEntity* Respawn( void );
-	virtual void ItemTouch( CBaseEntity *pOther );
 	virtual void Materialize( void );
 	virtual bool MyTouch( CBasePlayer *pPlayer ) { return false; };
+	virtual bool MyUse( CBasePlayer *pPlayer ) { return false; };
 
 	// Become touchable when we are at rest
 	virtual void OnEntityEvent( EntityEvent_t event, void *pEventData );
