@@ -122,8 +122,6 @@ void CWeaponBugBait::FallInit( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	SetSolid( SOLID_BBOX );
 	AddSolidFlags( FSOLID_TRIGGER );
-
-	SetPickupTouch();
 	
 	SetThink( &CBaseCombatWeapon::FallThink );
 
@@ -189,7 +187,6 @@ void CWeaponBugBait::BugbaitStickyTouch( CBaseEntity *pOther )
 	// Stop moving, wait for pickup
 	SetMoveType( MOVETYPE_NONE );
 	SetThink( NULL );
-	SetPickupTouch();
 }
 
 //-----------------------------------------------------------------------------

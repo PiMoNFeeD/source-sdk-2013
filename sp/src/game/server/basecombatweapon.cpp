@@ -514,9 +514,7 @@ void CBaseCombatWeapon::FallInit( void )
 			}
 		}
 #endif //CLIENT_DLL
-	}	
-
-	SetPickupTouch();
+	}
 	
 	SetThink( &CBaseCombatWeapon::FallThink );
 
@@ -588,8 +586,6 @@ void CBaseCombatWeapon::Materialize( void )
 	SetSolid( SOLID_BBOX );
 	AddSolidFlags( FSOLID_TRIGGER );
 #endif
-
-	SetPickupTouch();
 
 	SetThink (NULL);
 }

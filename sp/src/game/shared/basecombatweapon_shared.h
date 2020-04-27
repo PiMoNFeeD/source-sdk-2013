@@ -189,11 +189,6 @@ public:
 	virtual bool			VisibleInWeaponSelection( void );
 	virtual bool			HasAmmo( void );
 
-	// Weapon Pickup For Player
-	virtual void			SetPickupTouch( void );
-	virtual void 			DefaultTouch( CBaseEntity *pOther );	// default weapon touch
-	virtual void			GiveTo( CBaseEntity *pOther );
-
 	// HUD Hints
 	virtual bool			ShouldDisplayAltFireHUDHint();
 	virtual void			DisplayAltFireHudHint();	

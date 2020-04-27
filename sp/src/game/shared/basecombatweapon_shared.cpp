@@ -676,7 +676,6 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	RemoveEffects( EF_NODRAW );
 	FallInit();
 	SetGroundEntity( NULL );
-	SetThink( &CBaseCombatWeapon::SetPickupTouch );
 	SetTouch(NULL);
 
 	if( hl2_episodic.GetBool() )
@@ -802,48 +801,6 @@ void CBaseCombatWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &t
 	}
 }
 
-void CBaseCombatWeapon::GiveTo( CBaseEntity *pOther )
-{
-	DefaultTouch( pOther );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Default Touch function for player picking up a weapon (not AI)
-// Input  : pOther - the entity that touched me
-// Output :
-//-----------------------------------------------------------------------------
-void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
-{
-#if !defined( CLIENT_DLL )
-	// Can't pick up dissolving weapons
-	if ( IsDissolving() )
-		return;
-
-	// if it's not a player, ignore
-	CBasePlayer *pPlayer = ToBasePlayer(pOther);
-	if ( !pPlayer )
-		return;
-
-	if( UTIL_ItemCanBeTouchedByPlayer(this, pPlayer) )
-	{
-		// This makes sure the player could potentially take the object
-		// before firing the cache interaction output. That doesn't mean
-		// the player WILL end up taking the object, but cache interactions
-		// are fired as soon as you prove you have found the object, not
-		// when you finally acquire it.
-		m_OnCacheInteraction.FireOutput( pOther, this );
-	}
-
-	if( HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
-		return;
-
-	if (pPlayer->BumpWeapon(this))
-	{
-		OnPickedUp( pPlayer );
-	}
-#endif
-}
-
 //---------------------------------------------------------
 // It's OK for base classes to override this completely 
 // without calling up. (sjb)
@@ -936,24 +893,6 @@ void CBaseCombatWeapon::RescindReloadHudHint()
 	--m_iReloadHudHintCount;
 	m_bReloadHudHintDisplayed = false;
 #endif//CLIENT_DLL
-}
-
-
-void CBaseCombatWeapon::SetPickupTouch( void )
-{
-#if !defined( CLIENT_DLL )
-	SetTouch(&CBaseCombatWeapon::DefaultTouch);
-
-	if ( gpGlobals->maxClients > 1 )
-	{
-		if ( GetSpawnFlags() & SF_NORESPAWN )
-		{
-			SetThink( &CBaseEntity::SUB_Remove );
-			SetNextThink( gpGlobals->curtime + 30.0f );
-		}
-	}
-
-#endif
 }
 
 
@@ -2631,12 +2570,10 @@ BEGIN_DATADESC( CBaseCombatWeapon )
 //	DEFINE_FIELD( m_bJustRestored, FIELD_BOOLEAN ),
 
 	// Function pointers
-	DEFINE_ENTITYFUNC( DefaultTouch ),
 	DEFINE_THINKFUNC( FallThink ),
 	DEFINE_THINKFUNC( Materialize ),
 	DEFINE_THINKFUNC( AttemptToMaterialize ),
 	DEFINE_THINKFUNC( DestroyItem ),
-	DEFINE_THINKFUNC( SetPickupTouch ),
 
 	DEFINE_THINKFUNC( HideThink ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "HideWeapon", InputHideWeapon ),

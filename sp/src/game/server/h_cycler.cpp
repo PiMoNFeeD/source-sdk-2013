@@ -262,7 +262,6 @@ void CWeaponCycler::Spawn( )
 	m_iModel = GetModelIndex();
 
 	UTIL_SetSize(this, Vector(-16, -16, 0), Vector(16, 16, 16));
-	SetTouch( &CWeaponCycler::DefaultTouch );
 }
 
 
