@@ -439,6 +439,7 @@ $Project
 		$File	"locksounds.h"
 		$File	"logic_measure_movement.cpp"
 		$File	"logic_navigation.cpp"
+		$File	"logic_playmovie.cpp"
 		$File	"logicauto.cpp"
 		$File	"logicentities.cpp"
 		$File	"logicrelay.cpp"
