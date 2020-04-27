@@ -388,8 +388,8 @@ public:
 
 	// Handle view smoothing when going up stairs
 	void					SmoothViewOnStairs( Vector& eyeOrigin );
-	virtual float			CalcRoll (const QAngle& angles, const Vector& velocity, float rollangle, float rollspeed);
-	virtual float			CalcPitch (const QAngle& angles, const Vector& velocity, float rollangle, float rollspeed);
+	virtual float			CalcRoll ( const QAngle& angles, const Vector& velocity, float rollangle, float rollspeed );
+	virtual float			CalcPitch ( const QAngle& angles, const Vector& velocity, float rollangle, float rollspeed );
 	void					CalcViewBob( QAngle& eyeAngles );
 
 	virtual int				Save( ISave &save );

@@ -1802,8 +1802,8 @@ void CBasePlayer::CalcViewBob( QAngle& eyeAngles )
 	if ( GetMoveType() == MOVETYPE_NOCLIP )
 		return;
 
-	eyeAngles[ROLL] += CalcRoll( GetAbsAngles( ), GetAbsVelocity( ), sv_rollangle.GetFloat( ), sv_rollspeed.GetFloat( ) ) * 3;
-	eyeAngles[PITCH] += CalcPitch( GetAbsAngles( ), GetAbsVelocity( ), sv_rollangle.GetFloat( ), sv_rollspeed.GetFloat( ) ) * 3;
+	eyeAngles[ROLL] += CalcRoll( GetAbsAngles(), GetAbsVelocity(), sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() ) * 3;
+	eyeAngles[PITCH] += CalcPitch( GetAbsAngles(), GetAbsVelocity(), sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() ) * 3;
 }
 
 
