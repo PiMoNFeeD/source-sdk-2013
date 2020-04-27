@@ -21,7 +21,7 @@ REM ****************
 
 setlocal
 set arg_filename=%1
-set shadercompilecommand=shadercompile.exe
+set shadercompilecommand="%SDKBINDIR%\shadercompile.exe"
 set targetdir=shaders
 set SrcDirBase=..\..
 set shaderDir=shaders
@@ -71,7 +71,7 @@ REM ****************
 :set_mod_args
 
 if not exist "%SDKBINDIR%\shadercompile.exe" goto NoShaderCompile
-set ChangeToDir=%SDKBINDIR%
+set ChangeToDir="%SDKBINDIR%"
 
 if /i "%4" NEQ "-source" goto NoSourceDirSpecified
 set SrcDirBase=%~5
